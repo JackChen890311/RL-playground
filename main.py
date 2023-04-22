@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import pickle as pk
 import gymnasium as gym  
 
 def visualize_random():
@@ -49,7 +50,10 @@ def train(env, episode = 100000):
         if i % 10000 == 0:
             print(f"Episode: {i}")
     
-    print("Training finished.\n")
+    with open('q_table.pk','wb') as f:
+        pk.dump(q_table,f)
+
+    print("Training finished.")
     return q_table
 
 def test(env, episodes, q_table):
@@ -82,9 +86,13 @@ def test(env, episodes, q_table):
 
 
 if __name__ == '__main__':
-    env = gym.make("Taxi-v3")
-    _, _ = env.reset()
-    q_table = train(env, 100000)
+    # env = gym.make("Taxi-v3")
+    # _, _ = env.reset()
+    # q_table = train(env, 100000)
+
+
     env = gym.make("Taxi-v3", render_mode = 'human')
     _, _ = env.reset()
+    with open('q_table.pk','rb') as f:
+        q_table = pk.load(f)
     test(env, 10, q_table)

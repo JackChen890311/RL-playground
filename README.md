@@ -1,2 +1,2 @@
 # Reinforcement Learning Playground
-A little Reinforcement Learning playgroung using gymnasium
+A little Reinforcement Learning playgroung using gymnasium.
