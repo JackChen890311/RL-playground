@@ -1,22 +1,29 @@
+import os
 import random
 import numpy as np
 import pickle as pk
-import gymnasium as gym  
+import gymnasium as gym
+from tqdm import tqdm
+from gymnasium.envs.toy_text.frozen_lake import generate_random_map
+
+ENV_NAME = "FrozenLake-v1"
 
 def visualize_random():
-    env = gym.make("Taxi-v3", render_mode="human")
+    env = gym.make(ENV_NAME, render_mode="human")
     env.reset()
-    random_number = lambda:random.randint(0,5)
+    random_number = lambda: random.randint(0,env.action_space.n)
 
     print("Action Space {}".format(env.action_space)) 
     print("State Space {}".format(env.observation_space))
 
     while True:
-        result = env.step(random_number())
+        action = random_number()
+        print(f'Action: {action}')
+        result = env.step(action)
         print(result)
         env.render()
 
-def train(env, episode = 100000):
+def train(env, episode = 300000):
     """Training the agent"""
     alpha = 0.1
     gamma = 0.6
@@ -24,7 +31,7 @@ def train(env, episode = 100000):
 
     q_table = np.zeros([env.observation_space.n, env.action_space.n])
 
-    for i in range(episode):
+    for i in tqdm(range(episode)):
         state, info = env.reset()
         epochs, penalties, reward, = 0, 0, 0
         terminated = False
@@ -46,11 +53,8 @@ def train(env, episode = 100000):
                 penalties += 1
             state = next_state
             epochs += 1
-            
-        if i % 10000 == 0:
-            print(f"Episode: {i}")
     
-    with open('q_table.pk','wb') as f:
+    with open(f'{ENV_NAME}.pk','wb') as f:
         pk.dump(q_table,f)
 
     print("Training finished.")
@@ -86,13 +90,15 @@ def test(env, episodes, q_table):
 
 
 if __name__ == '__main__':
-    # env = gym.make("Taxi-v3")
-    # _, _ = env.reset()
-    # q_table = train(env, 100000)
+    # visualize_random()
+    
+    if not os.path.exists(f'{ENV_NAME}.pk'):
+        env = gym.make(ENV_NAME, is_slippery=False)
+        _, _ = env.reset()
+        q_table = train(env)
 
-
-    env = gym.make("Taxi-v3", render_mode = 'human')
+    env = gym.make(ENV_NAME, is_slippery=False, render_mode = 'human')
     _, _ = env.reset()
-    with open('q_table.pk','rb') as f:
+    with open(f'{ENV_NAME}.pk','rb') as f:
         q_table = pk.load(f)
     test(env, 10, q_table)
