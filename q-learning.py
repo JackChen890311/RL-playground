@@ -6,7 +6,8 @@ import gymnasium as gym
 from tqdm import tqdm
 from gymnasium.envs.toy_text.frozen_lake import generate_random_map
 
-ENV_NAME = "FrozenLake-v1"
+ENV_NAME = "Taxi-v3"
+# ENV_NAME = "FrozenLake-v1"
 
 def visualize_random():
     env = gym.make(ENV_NAME, render_mode="human")
@@ -93,11 +94,13 @@ if __name__ == '__main__':
     # visualize_random()
     
     if not os.path.exists(f'{ENV_NAME}.pk'):
-        env = gym.make(ENV_NAME, is_slippery=False)
+        env = gym.make(ENV_NAME)
+        # env = gym.make(ENV_NAME, is_slippery=False)
         _, _ = env.reset()
         q_table = train(env)
 
-    env = gym.make(ENV_NAME, is_slippery=False, render_mode = 'human')
+    env = gym.make(ENV_NAME, render_mode = 'human')
+    # env = gym.make(ENV_NAME, is_slippery=False, render_mode = 'human')
     _, _ = env.reset()
     with open(f'{ENV_NAME}.pk','rb') as f:
         q_table = pk.load(f)
